@@ -8,7 +8,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                                    octoprint.plugin.SettingsPlugin,
                                    octoprint.plugin.TemplatePlugin):
 
-    def on_gcode_received(self, *args, **kwargs):
+    def on_atcommand_sending(self, *args, **kwargs):
         # We expect at least two arguments: comm and line.
         if len(args) < 2:
             return ""
@@ -16,7 +16,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
         line = args[1]
         stripped = line.strip()
         if stripped.startswith("@ENCLOSUREHEATER"):
-            self._logger.info("Enclosure Heater command detected: %s", stripped)
+            self._logger.info("Enclosure Heater command detected (AT): %s", stripped)
             payload = None
             try:
                 # Handle @ENCLOSUREHEATER-ON [optional T<temperature>]
@@ -28,7 +28,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                             if part.upper().startswith("T"):
                                 try:
                                     temp_value = float(part[1:])
-                                    payload["setpoint"] = int(temp_value)  # or use float() if needed
+                                    payload["setpoint"] = int(temp_value)  # or float(temp_value)
                                 except ValueError:
                                     self._logger.error("Invalid temperature value in command: %s", part)
                                 break
@@ -44,7 +44,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                         self._logger.error("Error parsing JSON from @ENCLOSUREHEATER-SET: %s", e)
                         payload = None
                 else:
-                    self._logger.warn("Unknown Enclosure Heater command: %s", stripped)
+                    self._logger.warn("Unknown Enclosure Heater command (AT): %s", stripped)
                 
                 if payload is not None:
                     api_url = self._settings.get(["api_url"], "http://fileserver5.localnet:1880/api/v1/enclosureheater/setparams")
@@ -52,7 +52,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                     response = requests.post(api_url, json=payload, timeout=5)
                     self._logger.info("API response: %s %s", response.status_code, response.text)
             except Exception as e:
-                self._logger.error("Error processing Enclosure Heater command: %s", e)
+                self._logger.error("Error processing Enclosure Heater command (AT): %s", e)
         return line
 
     def get_settings_defaults(self):
@@ -64,7 +64,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
         return [dict(type="settings", custom_bindings=False)]
 
     def on_after_startup(self):
-        self._logger.info("Enclosure Heater Command Plugin started")
+        self._logger.info("Enclosure Heater Command Plugin started (AT Hook)")
 
     ##-- Software Update Information (optional)
     def get_update_information(self):
@@ -84,7 +84,7 @@ __plugin_name__ = "Enclosure Heater Command Plugin"
 __plugin_pythoncompat__ = ">=2.7,<4"
 __plugin_implementation__ = EnclosureHeaterCommandPlugin()
 
-# Register our hook on "received" with priority -100 so it runs as early as possible.
+# Register our hook using "atcommand.sending" with a very low priority to run as early as possible.
 __plugin_hooks__ = {
-    "octoprint.comm.protocol.gcode.received": (__plugin_implementation__.on_gcode_received, -100)
+    "octoprint.comm.protocol.atcommand.sending": (__plugin_implementation__.on_atcommand_sending, -100)
 }
