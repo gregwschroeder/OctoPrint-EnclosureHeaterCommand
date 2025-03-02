@@ -1,0 +1,10 @@
+MANIFEST.in
+README.md
+setup.py
+OctoPrint_EnclosureHeaterCommand.egg-info/PKG-INFO
+OctoPrint_EnclosureHeaterCommand.egg-info/SOURCES.txt
+OctoPrint_EnclosureHeaterCommand.egg-info/dependency_links.txt
+OctoPrint_EnclosureHeaterCommand.egg-info/entry_points.txt
+OctoPrint_EnclosureHeaterCommand.egg-info/requires.txt
+OctoPrint_EnclosureHeaterCommand.egg-info/top_level.txt
+octoprint_EnclosureHeaterCommand/__init__.py

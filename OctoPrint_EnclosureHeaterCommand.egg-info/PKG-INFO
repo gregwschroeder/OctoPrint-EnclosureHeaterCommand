@@ -1,0 +1,33 @@
+Metadata-Version: 2.1
+Name: OctoPrint-EnclosureHeaterCommand
+Version: 0.1.0
+Summary: OctoPrint plugin to process custom enclosure heater commands and send JSON API requests.
+Home-page: https://github.com/gregwschroeder/OctoPrint-EnclosureHeaterCommand
+Author: Greg Schroeder
+Author-email: gregwschroeder@gmail.com
+License: AGPLv3
+Classifier: Framework :: OctoPrint
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3 (AGPLv3)
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/markdown
+
+# OctoPrint-EnclosureHeaterCommand
+
+This plugin listens for custom G-code commands starting with `@ENCLOSUREHEATER` and sends corresponding JSON payloads to a fixed API endpoint.
+
+Supported commands:
+
+- `@ENCLOSUREHEATER-ON`  
+  → Sends: `{"HeaterArmed": true}`
+
+- `@ENCLOSUREHEATER-OFF`  
+  → Sends: `{"HeaterArmed": false}`
+
+- `@ENCLOSUREHEATER-ON Ttt`  
+  → Sends: `{"HeaterArmed": true, "setpoint": tt}`
+
+- `@ENCLOSUREHEATER-SET <json-data>`  
+  → Sends the provided JSON payload
+
+The API endpoint is fixed by default but can be changed in the plugin settings if needed.

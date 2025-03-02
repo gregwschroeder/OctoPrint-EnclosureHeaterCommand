@@ -1,0 +1,2 @@
+[octoprint.plugin]
+EnclosureHeaterCommand = octoprint_EnclosureHeaterCommand
