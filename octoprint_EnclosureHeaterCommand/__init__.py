@@ -8,7 +8,12 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                                    octoprint.plugin.SettingsPlugin,
                                    octoprint.plugin.TemplatePlugin):
 
-    def on_gcode_received(self, comm, line, parsed=None):
+    def on_gcode_received(self, *args, **kwargs):
+        # We expect at least two arguments: comm and line.
+        if len(args) < 2:
+            return ""
+        comm = args[0]
+        line = args[1]
         stripped = line.strip()
         if stripped.startswith("@ENCLOSUREHEATER"):
             self._logger.info("Enclosure Heater command detected: %s", stripped)
@@ -18,21 +23,18 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                 if stripped.startswith("@ENCLOSUREHEATER-ON"):
                     payload = {"HeaterArmed": True}
                     parts = stripped.split()
-                    # Look for an extra token starting with 'T'
                     if len(parts) > 1:
                         for part in parts[1:]:
                             if part.upper().startswith("T"):
                                 try:
                                     temp_value = float(part[1:])
-                                    payload["setpoint"] = int(temp_value)  # or use float(temp_value) if needed
+                                    payload["setpoint"] = int(temp_value)  # or use float() if needed
                                 except ValueError:
                                     self._logger.error("Invalid temperature value in command: %s", part)
                                 break
-
                 # Handle @ENCLOSUREHEATER-OFF
                 elif stripped.startswith("@ENCLOSUREHEATER-OFF"):
                     payload = {"HeaterArmed": False}
-
                 # Handle @ENCLOSUREHEATER-SET <json-data>
                 elif stripped.startswith("@ENCLOSUREHEATER-SET"):
                     json_part = stripped[len("@ENCLOSUREHEATER-SET"):].strip()
@@ -82,7 +84,7 @@ __plugin_name__ = "Enclosure Heater Command Plugin"
 __plugin_pythoncompat__ = ">=2.7,<4"
 __plugin_implementation__ = EnclosureHeaterCommandPlugin()
 
-# Use the "received" hook with a lower (earlier) priority (e.g. -10)
+# Register our hook on "received" with priority -100 so it runs as early as possible.
 __plugin_hooks__ = {
-    "octoprint.comm.protocol.gcode.received": (__plugin_implementation__.on_gcode_received, -10)
+    "octoprint.comm.protocol.gcode.received": (__plugin_implementation__.on_gcode_received, -100)
 }

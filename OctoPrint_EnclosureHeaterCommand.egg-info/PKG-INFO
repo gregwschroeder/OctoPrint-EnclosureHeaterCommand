@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: OctoPrint-EnclosureHeaterCommand
-Version: 0.1.5
+Version: 0.1.6
 Summary: OctoPrint plugin to process custom enclosure heater commands and send JSON API requests.
 Home-page: https://github.com/gregwschroeder/OctoPrint-EnclosureHeaterCommand
 Author: Greg Schroeder
