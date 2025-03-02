@@ -8,7 +8,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                                    octoprint.plugin.SettingsPlugin,
                                    octoprint.plugin.TemplatePlugin):
 
-    def on_gcode_received(self, comm, line, parsed):
+    def on_gcode_received(self, comm, line, parsed=None):
         stripped = line.strip()
         if stripped.startswith("@ENCLOSUREHEATER"):
             self._logger.info("Enclosure Heater command detected: %s", stripped)
