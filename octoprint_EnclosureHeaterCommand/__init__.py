@@ -8,7 +8,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                                    octoprint.plugin.SettingsPlugin,
                                    octoprint.plugin.TemplatePlugin):
 
-    def on_gcode_received(self, comm, line):
+    def on_gcode_received(self, comm, line, parsed):
         stripped = line.strip()
         if stripped.startswith("@ENCLOSUREHEATER"):
             self._logger.info("Enclosure Heater command detected: %s", stripped)
@@ -24,7 +24,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                             if part.upper().startswith("T"):
                                 try:
                                     temp_value = float(part[1:])
-                                    payload["setpoint"] = int(temp_value)  # Use int or float as needed
+                                    payload["setpoint"] = int(temp_value)  # or use float(temp_value) if needed
                                 except ValueError:
                                     self._logger.error("Invalid temperature value in command: %s", part)
                                 break
@@ -45,7 +45,6 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                     self._logger.warn("Unknown Enclosure Heater command: %s", stripped)
                 
                 if payload is not None:
-                    # Use the API URL from settings; default is hard-coded below.
                     api_url = self._settings.get(["api_url"], "http://fileserver5.localnet:1880/api/v1/enclosureheater/setparams")
                     self._logger.info("Sending API request to %s with payload: %s", api_url, payload)
                     response = requests.post(api_url, json=payload, timeout=5)
@@ -83,6 +82,7 @@ __plugin_name__ = "Enclosure Heater Command Plugin"
 __plugin_pythoncompat__ = ">=2.7,<4"
 __plugin_implementation__ = EnclosureHeaterCommandPlugin()
 
+# Use the "received" hook with a lower (earlier) priority (e.g. -10)
 __plugin_hooks__ = {
-    "octoprint.comm.protocol.gcode.received": (__plugin_implementation__.on_gcode_received, -1)
+    "octoprint.comm.protocol.gcode.received": (__plugin_implementation__.on_gcode_received, -10)
 }
