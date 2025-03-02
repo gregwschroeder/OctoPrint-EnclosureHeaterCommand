@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="OctoPrint-EnclosureHeaterCommand",
-    version="0.1.8",
+    version="0.1.9",
     description="OctoPrint plugin to process custom enclosure heater commands and send JSON API requests.",
     long_description=long_description,
     long_description_content_type="text/markdown",

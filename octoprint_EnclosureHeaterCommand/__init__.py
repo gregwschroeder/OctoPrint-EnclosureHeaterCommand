@@ -9,7 +9,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                                    octoprint.plugin.TemplatePlugin):
 
     def on_atcommand_queuing(self, comm, phase, command, parameters, tags=None, *args, **kwargs):
-        # We process only during the queuing phase.
+        # Process only during the queuing phase.
         if phase != "queuing":
             return
         # Only process commands that start with ENCLOSUREHEATER.
@@ -40,7 +40,8 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
             self._logger.warn("Unknown ENCLOSUREHEATER command: %s", command)
 
         if payload is not None:
-            api_url = self._settings.get(["api_url"], "http://fileserver5.localnet:1880/api/v1/enclosureheater/setparams")
+            # Retrieve the API URL from settings, or use our default.
+            api_url = self._settings.get(["api_url"]) or "http://fileserver5.localnet:1880/api/v1/enclosureheater/setparams"
             self._logger.info("Sending API request to %s with payload: %s", api_url, payload)
             try:
                 response = requests.post(api_url, json=payload, timeout=5)
@@ -77,7 +78,7 @@ __plugin_name__ = "Enclosure Heater Command Plugin"
 __plugin_pythoncompat__ = ">=2.7,<4"
 __plugin_implementation__ = EnclosureHeaterCommandPlugin()
 
-# Register our hook for the atcommand queuing phase with a low (early) priority.
+# Register our hook for the atcommand.queuing phase with priority -100 so it runs early.
 __plugin_hooks__ = {
     "octoprint.comm.protocol.atcommand.queuing": (__plugin_implementation__.on_atcommand_queuing, -100)
 }
