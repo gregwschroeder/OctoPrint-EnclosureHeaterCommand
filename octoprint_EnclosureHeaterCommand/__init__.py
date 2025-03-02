@@ -9,6 +9,7 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
                                    octoprint.plugin.TemplatePlugin):
 
     def process_gcode(self, comm, line):
+        self._logger.debug("Processing G-code line: %s", stripped)
         stripped = line.strip()
         if stripped.startswith("@ENCLOSUREHEATER"):
             self._logger.info("Enclosure Heater command detected: %s", stripped)
@@ -65,6 +66,21 @@ class EnclosureHeaterCommandPlugin(octoprint.plugin.StartupPlugin,
 
     def on_after_startup(self):
         self._logger.info("Enclosure Heater Command Plugin started")
+        
+    ##-- Software Update Information (optional)
+    def get_update_information(self):
+        return {
+            "enclosureheatercommand": {
+                "displayName": "Enclosure Heater Command Plugin",
+                "displayVersion": self._plugin_version,
+                "type": "github_release",
+                "user": "gregwschroeder",         
+                "repo": "https://github.com/gregwschroeder/OctoPrint-EnclosureHeaterCommand",  # Replace with your repository name
+                "current": self._plugin_version,
+                "pip": "https://github.com/your_github_username/OctoPrint-EnclosureHeaterCommand/archive/{target_version}.zip"
+            }
+        }
+        
 
 __plugin_name__ = "Enclosure Heater Command Plugin"
 __plugin_pythoncompat__ = ">=2.7,<4"
